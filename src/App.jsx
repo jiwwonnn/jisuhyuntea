@@ -6,7 +6,7 @@ const App = () => {
 
   const [todoList, setTodoList] = useState([]) // 투두리스트 배열
   const [todo, setTodo] = useState('') // 투두 입력 내용
-  const [edit, setEdit] = useState(false) // 수정 상태
+  const [editId, setEditId] = useState(false) // 수정 상태
   const [editText, setEditText] = useState('') // 수정 텍스트
 
 
@@ -49,13 +49,14 @@ const App = () => {
   }
 
   // 할일을 클릭하면 수정상태로 변경.
-  const handleEdit = (id) => {
-    console.log(id, "ID")
+  const handleEdit = (id, text) => {
+    setEditId(id)
+    setEditText(text)
   }
 
   // 수정 input value
   const handleEditChange = (e) => {
-    setEdit(e.target.value)
+    setEditText(e.target.value)
   }
 
   // 수정 버튼을 눌렀을때
@@ -63,6 +64,8 @@ const App = () => {
     setTodoList(
       todoList.map((item)=> item.id === id ? {...item, text: editText, isEdit: true} : item)
     )
+    setEditId("")
+    setEditText('')
   }
 
 
@@ -82,16 +85,16 @@ const App = () => {
               <div className='mid' key={item.id}>
                 <input type="checkbox" onClick={() => listCheckedToggle(item.id)}/>
                 {
-                  item.isEdit ?
+                  item.id === editId ?
                     (
                       <div>
-                        <input type="text" value={item.text} onChange={handleEditChange}/>
+                        <input type="text" value={editText} onChange={handleEditChange}/>
                         <button onClick={() => handleEditSubmit(item.id)}>수정완료</button>
                       </div>
                     )
                     :
                     (
-                      <div className={item.checked ? 'checked' : ""} onClick={() => handleEdit(item.id)}>{item.text}</div>
+                      <div className={item.checked ? 'checked' : ""} onClick={() => handleEdit(item.id,item.text)}>{item.text}</div>
                     )
 
                 }
