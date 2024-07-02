@@ -65,20 +65,22 @@ const App = () => {
   }
 
   // 할일을 클릭하면 수정상태로 변경.
-  const handleEdit = (id) => {
-    console.log(id, "ID")
+  const handleEdit = (id, text) => {
+    setEditText(text)
+    setTodoList(todoList.map((item) => item.id === id ? { ...item , isEdit: true} : item))
   }
 
   // 수정 input value
   const handleEditChange = (e) => {
-    setEdit(e.target.value)
+    setEditText(e.target.value)
   }
 
   // 수정 버튼을 눌렀을때
   const handleEditSubmit = (id) => {
     setTodoList(
-      todoList.map((item)=> item.id === id ? {...item, text: editText, isEdit: true} : item)
+      todoList.map((item)=> item.id === id ? {...item, text: editText, isEdit: false} : item)
     )
+    setEditText('');
   }
 
   // 체크표시한 개수를 확인하는 방법 ...
@@ -89,7 +91,7 @@ const App = () => {
 
   // 완료된거 삭제하기
   const clearCompletedDelete = () => {
-
+    setTodoList(todoList.filter((item) => !item.checked))
   }
 
 
@@ -104,12 +106,12 @@ const App = () => {
             item.isEdit ?
               (
                 <div>
-                  <input type="text" value={item.text} onChange={handleEditChange}/>
+                  <input type="text" value={editText} onChange={handleEditChange}/>
                   <button onClick={() => handleEditSubmit(item.id)}>수정완료</button>
                 </div>
               ) :
               (
-                <div className={item.checked ? 'checked' : ""} onClick={() => handleEdit(item.id)}>{item.text}</div>
+                <div className={item.checked ? 'checked' : ""} onClick={() => handleEdit(item.id, item.text)}>{item.text}</div>
               )
 
           }
@@ -149,7 +151,7 @@ const App = () => {
           <button onClick={() => setFilter("completed")} >completed</button>
         </div>
         {/*완료된거만 삭제하기*/}
-        <button>clear completed</button>
+        <button onClick={clearCompletedDelete}>clear completed</button>
       </div>
 
       <div className='botbot'>할 일 클릭시 수정 가능</div>
