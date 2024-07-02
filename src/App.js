@@ -8,8 +8,24 @@ const App = () => {
   const [todo, setTodo] = useState('') // 투두 입력 내용
   const [edit, setEdit] = useState(false) // 수정 상태
   const [editText, setEditText] = useState('') // 수정 텍스트
+  const [filter, setFilter] = useState("all")
 
-  
+
+  // 전체 체크박스 선택하기
+  const handleAllCheckbox = () => {
+    let clone = [...todoList]
+
+    if (todoList.every(ele => ele.checked)) {
+      clone=clone.map(ele => ({...ele, checked: false}))
+    } else {
+      clone=clone.map(ele => ({...ele, checked: true}))
+    }
+    console.log(clone)
+    setTodoList(clone)
+  }
+
+
+
   // input 에 value 값 넣기
   const handleChange = (e) => {
     setTodo(e.target.value)
@@ -65,57 +81,72 @@ const App = () => {
     )
   }
 
+  // 체크표시한 개수를 확인하는 방법 ...
+  const countCheckedFilter = () => {
+    return todoList.filter((item) => item.checked).length
+  }
 
+
+  // 완료된거 삭제하기
+  const clearCompletedDelete = () => {
+
+  }
+
+
+  // 은지님 도움받은 코드
+  const getList = (type="all") => {
+    const list = type === "all" ? todoList : type === "not" ? todoList.filter((item) => !item.checked && item) : type === "completed" ? todoList.filter((item) => item.checked && item) : todoList.filter((item) => !item.checked && item)
+    return (
+      list.map((item , idx) => (
+        <div className='mid' key={item.id}>
+          <input type="checkbox" onClick={() => listCheckedToggle(item.id)} checked={item.checked}/>
+          {
+            item.isEdit ?
+              (
+                <div>
+                  <input type="text" value={item.text} onChange={handleEditChange}/>
+                  <button onClick={() => handleEditSubmit(item.id)}>수정완료</button>
+                </div>
+              ) :
+              (
+                <div className={item.checked ? 'checked' : ""} onClick={() => handleEdit(item.id)}>{item.text}</div>
+              )
+
+          }
+          <div><button onClick={() => handleListDelete(item.id)}>삭제</button></div>
+        </div>
+      ))
+    )
+  }
 
 
   return (
     <div className='all'>
       <div className={'top'}>
         {/*여기 input checkbox 누르면 모든 할일이 완료된 상태로 변경되게만 작업해보기*/}
-        <input type="checkbox" />
+        <input type="checkbox" onClick={handleAllCheckbox} checked={todoList.length && todoList.every(ele =>  ele.checked)}/>
         <input type="text" placeholder='입력' value={todo} onChange={handleChange} onKeyPress={handleKeyPress}/>
       </div>
       <div>
-        {
-          todoList.map((item , idx) => {
-            return (
-              <div className='mid' key={item.id}>
-                <input type="checkbox" onClick={() => listCheckedToggle(item.id)}/>
-                {
-                  item.isEdit ?
-                    (
-                      <div>
-                        <input type="text" value={item.text} onChange={handleEditChange}/>
-                        <button onClick={() => handleEditSubmit(item.id)}>수정완료</button>
-                      </div>
-                    )
-                    :
-                    (
-                      <div className={item.checked ? 'checked' : ""} onClick={() => handleEdit(item.id)}>{item.text}</div>
-                    )
-
-                }
-                <div><button onClick={() => handleListDelete(item.id)}>삭제</button></div>
-              </div>
-            )
-          })
-        }
-
+        {getList(filter)}
       </div>
 
 
       <div className='bot'>
         {/*남은 항목 개수 */}
         <div>
-          2 items left
+          {countCheckedFilter()} items left
         </div>
         <div>
           {/*전체 확인하기*/}
-          <button>all</button>
+          <button onClick={() => setFilter("all")} >all</button>
           {/*진행중 확인하기*/}
-          <button>not</button>
+          <button
+            // onClick={() => todoNotItem()}
+            onClick={() => setFilter("not")}
+            >not</button>
           {/*종료 확인하기*/}
-          <button>completed</button>
+          <button onClick={() => setFilter("completed")} >completed</button>
         </div>
         {/*완료된거만 삭제하기*/}
         <button>clear completed</button>
